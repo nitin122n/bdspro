@@ -153,8 +153,7 @@ CREATE TABLE IF NOT EXISTS deposits (
     address VARCHAR(100) NOT NULL,
     amount DECIMAL(15,2) NOT NULL,
     transaction_hash VARCHAR(100) UNIQUE,
-    proof_image VARCHAR(255) NULL,
-    status ENUM('pending', 'confirmed', 'failed', 'cancelled', 'verified', 'rejected') DEFAULT 'pending',
+    status ENUM('pending', 'confirmed', 'failed', 'cancelled') DEFAULT 'pending',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
@@ -214,17 +213,6 @@ CREATE TABLE IF NOT EXISTS business_tracking (
     INDEX idx_created_at (created_at)
 );
 
--- User wallets table for tracking wallet balances
-CREATE TABLE IF NOT EXISTS user_wallets (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
-    balance DECIMAL(10,2) DEFAULT 0.00,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
-    UNIQUE KEY unique_user_wallet (user_id),
-    INDEX idx_user_id (user_id)
-);
 
 -- Create views for easier reporting
 CREATE OR REPLACE VIEW user_summary AS

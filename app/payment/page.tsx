@@ -61,7 +61,6 @@ export default function PaymentPage() {
     setIsSubmitting(true);
     
     try {
-      // First, submit the payment
       const response = await fetchWithAuth('/api/payments', {
         method: 'POST',
         body: JSON.stringify({
@@ -76,33 +75,7 @@ export default function PaymentPage() {
 
       if (result.success) {
         setPaymentId(result.data.paymentId);
-        
-        // Upload proof image if provided
-        if (data.screenshot && data.screenshot.length > 0) {
-          const formData = new FormData();
-          formData.append('proof_image', data.screenshot[0]);
-          formData.append('deposit_id', result.data.paymentId);
-
-          try {
-            const uploadResponse = await fetchWithAuth('/api/upload/proof', {
-              method: 'POST',
-              body: formData,
-            });
-
-            const uploadResult = await uploadResponse.json();
-            
-            if (uploadResult.success) {
-              toast.success('Payment and proof image submitted successfully!');
-            } else {
-              toast.error('Payment submitted but proof image upload failed: ' + uploadResult.message);
-            }
-          } catch (uploadError) {
-            console.error('Proof image upload error:', uploadError);
-            toast.error('Payment submitted but proof image upload failed');
-          }
-        } else {
-          toast.success('Payment submitted successfully!');
-        }
+        toast.success('Payment submitted successfully!');
       } else {
         toast.error(result.message || 'Failed to submit payment');
       }
@@ -358,11 +331,11 @@ export default function PaymentPage() {
                 <input
                   {...register('screenshot', { required: 'Screenshot is required' })}
                   type="file"
-                  accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
+                  accept="image/jpeg,image/png"
                   className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-blue-600 file:text-white hover:file:bg-blue-700"
                 />
                 <p className="text-gray-400 text-sm mt-1">
-                  Upload a screenshot of your blockchain transaction (JPG/PNG/GIF/WebP, max 5MB)
+                  Upload a screenshot of your blockchain transaction (JPG/PNG, max 5MB)
                 </p>
                 {errors.screenshot && (
                   <p className="text-red-400 text-sm mt-1">{errors.screenshot.message}</p>

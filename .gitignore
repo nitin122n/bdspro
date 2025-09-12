@@ -105,7 +105,3 @@ jspm_packages/
 # Temporary files
 *.tmp
 *.temp
-
-# Upload directories (keep structure but ignore contents)
-public/uploads/*
-!public/uploads/.gitkeep

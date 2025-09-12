@@ -67,18 +67,18 @@ export default function DashboardPage() {
       }
 
       // Regular token check
-      const storedAccessToken = localStorage.getItem('accessToken');
-      const storedRefreshToken = localStorage.getItem('refreshToken');
-      if (!storedAccessToken || !storedRefreshToken) {
+      const accessToken = localStorage.getItem('accessToken');
+      const refreshToken = localStorage.getItem('refreshToken');
+      if (!accessToken || !refreshToken) {
         router.push('/login');
         return;
       }
 
       try {
-        console.log('Checking authentication with tokens:', { accessToken: !!storedAccessToken, refreshToken: !!storedRefreshToken });
+        console.log('Checking authentication with tokens:', { accessToken: !!accessToken, refreshToken: !!refreshToken });
         
         // Simple token validation - just check if tokens exist and are not empty
-        if (storedAccessToken && storedAccessToken.length > 10 && storedRefreshToken && storedRefreshToken.length > 10) {
+        if (accessToken && accessToken.length > 10 && refreshToken && refreshToken.length > 10) {
           console.log('Tokens are valid, setting authenticated');
           setIsAuthenticated(true);
         } else {
