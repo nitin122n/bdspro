@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
 
     // Get user's payments from database
     const [payments] = await db.execute<RowDataPacket[]>(
-      'SELECT * FROM deposits WHERE user_id = ? ORDER BY created_at DESC',
+      'SELECT * FROM transactions WHERE user_id = ? AND type = "deposit" ORDER BY timestamp DESC',
       [user.user_id]
     );
 
@@ -77,10 +77,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Insert payment into database
+    // Insert payment into database as a transaction
     const [result] = await db.execute(
-      'INSERT INTO deposits (user_id, network, address, amount, transaction_hash, status) VALUES (?, ?, ?, ?, ?, ?)',
-      [user.user_id, network, address, amount, transaction_hash || null, 'pending']
+      'INSERT INTO transactions (user_id, type, amount, credit, debit, balance, description, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+      [user.user_id, 'deposit', amount, amount, 0, 0, `Deposit via ${network} to ${address}`, 'pending']
     );
 
     const insertResult = result as any;

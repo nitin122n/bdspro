@@ -61,6 +61,7 @@ export default function PaymentPage() {
     setIsSubmitting(true);
     
     try {
+      // First, create a transaction record
       const response = await fetchWithAuth('/api/payments', {
         method: 'POST',
         body: JSON.stringify({
@@ -75,7 +76,33 @@ export default function PaymentPage() {
 
       if (result.success) {
         setPaymentId(result.data.paymentId);
-        toast.success('Payment submitted successfully!');
+        
+        // Upload proof image if provided
+        if (data.screenshot && data.screenshot.length > 0) {
+          const formData = new FormData();
+          formData.append('proof_image', data.screenshot[0]);
+          formData.append('transaction_id', result.data.paymentId);
+
+          try {
+            const uploadResponse = await fetchWithAuth('/api/upload/proof', {
+              method: 'POST',
+              body: formData,
+            });
+
+            const uploadResult = await uploadResponse.json();
+            
+            if (uploadResult.success) {
+              toast.success('Payment and proof image submitted successfully!');
+            } else {
+              toast.error('Payment submitted but proof image upload failed: ' + uploadResult.message);
+            }
+          } catch (uploadError) {
+            console.error('Proof image upload error:', uploadError);
+            toast.error('Payment submitted but proof image upload failed');
+          }
+        } else {
+          toast.success('Payment submitted successfully!');
+        }
       } else {
         toast.error(result.message || 'Failed to submit payment');
       }
