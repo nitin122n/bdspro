@@ -358,11 +358,11 @@ export default function PaymentPage() {
                 <input
                   {...register('screenshot', { required: 'Screenshot is required' })}
                   type="file"
-                  accept="image/jpeg,image/png"
+                  accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
                   className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-blue-600 file:text-white hover:file:bg-blue-700"
                 />
                 <p className="text-gray-400 text-sm mt-1">
-                  Upload a screenshot of your blockchain transaction (JPG/PNG, max 5MB)
+                  Upload a screenshot of your blockchain transaction (JPG/PNG/GIF/WebP, max 5MB)
                 </p>
                 {errors.screenshot && (
                   <p className="text-red-400 text-sm mt-1">{errors.screenshot.message}</p>
