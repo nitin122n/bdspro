@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { LogOut, User, Users, LayoutGrid, Wallet, TrendingUp, Gift, Briefcase, ArrowUpRight } from 'lucide-react';
-import { isAuthenticated, logout, fetchWithAuth } from '@/lib/auth';
 
 type StatCard = {
   title: string;
@@ -67,17 +66,33 @@ export default function DashboardPage() {
         return;
       }
 
-      // Use the auth utility to check authentication
+      // Regular token check
+      const accessToken = localStorage.getItem('accessToken');
+      const refreshToken = localStorage.getItem('refreshToken');
+      if (!accessToken || !refreshToken) {
+        router.push('/login');
+        return;
+      }
+
       try {
-        if (isAuthenticated()) {
-          console.log('User is authenticated');
+        console.log('Checking authentication with tokens:', { accessToken: !!accessToken, refreshToken: !!refreshToken });
+        
+        // Simple token validation - just check if tokens exist and are not empty
+        if (accessToken && accessToken.length > 10 && refreshToken && refreshToken.length > 10) {
+          console.log('Tokens are valid, setting authenticated');
           setIsAuthenticated(true);
         } else {
-          console.log('User is not authenticated, redirecting to login');
+          console.error('Invalid tokens, redirecting to login');
+          localStorage.removeItem('accessToken');
+          localStorage.removeItem('refreshToken');
+          localStorage.removeItem('userData');
           router.push('/login');
         }
       } catch (error) {
         console.error('Auth check failed:', error);
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+        localStorage.removeItem('userData');
         router.push('/login');
       } finally {
         setLoading(false);
@@ -126,10 +141,17 @@ export default function DashboardPage() {
       
       try {
         setUserLoading(true);
+        const token = localStorage.getItem('authToken');
+        const baseUrl = process.env.NEXT_PUBLIC_API_URL || '';
         
-        console.log('Fetching user data...');
+        console.log('Fetching user data with token:', token ? 'present' : 'missing');
         
-        const response = await fetchWithAuth(`/api/dashboard/user-data`);
+        const response = await fetch(`/api/dashboard/user-data`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
         
         console.log('User data response status:', response.status);
         
@@ -152,7 +174,9 @@ export default function DashboardPage() {
   }, [isAuthenticated, loading]);
 
   const handleLogout = () => {
-    logout();
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('userData');
+    router.push('/login');
   };
 
   if (loading) {

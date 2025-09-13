@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import { Eye, EyeOff, Mail, Lock, Chrome } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { login } from '@/lib/auth';
@@ -16,6 +17,7 @@ interface LoginFormData {
 const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const { signInWithGoogle } = useAuth();
   const router = useRouter();
 
   const {
@@ -43,9 +45,13 @@ const LoginForm = () => {
     }
   };
 
-  const handleGoogleSignIn = () => {
-    // Direct redirect to Google OAuth
-    window.location.href = '/api/auth/google';
+  const handleGoogleSignIn = async () => {
+    try {
+      await signInWithGoogle();
+      router.push('/dashboard');
+    } catch (error) {
+      // Error is handled in the hook
+    }
   };
 
   return (
